@@ -97,4 +97,47 @@ export const uploadAttachment = async (req, res) => {
   }
 };
 
+// Add a comment to a post
+export const addComment = async (req, res) => {
+  try {
+    const postId = req.params.postId; // Assuming postId is in the route parameters
+    const { userId, text } = req.body;
 
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const newComment = {
+      userId,
+      text,
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to add comment' });
+  }
+};
+
+// Fetch comments for a post
+export const getCommentsForPost = async (req, res) => {
+  try {
+    const postId = req.params.postId; // Assuming postId is in the route parameters
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const comments = post.comments;
+    res.status(200).json(comments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to retrieve comments' });
+  }
+};

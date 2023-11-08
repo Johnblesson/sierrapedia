@@ -11,6 +11,8 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
+import messageRoutes from "./routes/message.js"
+import commentRoutes from './routes/comment.js';
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
 import { verifyToken } from "./middleware/auth.js";
@@ -53,25 +55,8 @@ app.post('/upload', verifyToken, attachmentUpload.single('attachment'), uploadAt
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
-
-// Use the attachment routes
-// app.use('/attachments', attachmentRoutes);
-
-/* MONGOOSE SETUP */
-// const PORT = process.env.PORT || 6001;
-// mongoose
-//   .connect(process.env.MONGO_URL, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   })
-//   .then(() => {
-//     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
-
-//     /* ADD DATA ONE TIME */
-//     // User.insertMany(users);
-//     // Post.insertMany(posts);
-//   })
-//   .catch((error) => console.log(`${error} did not connect`));
+app.use('/messages', messageRoutes);
+app.use('/comments', commentRoutes);
 
 // Start the Server  
 const PORT = process.env.PORT || 8080
