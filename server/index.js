@@ -48,7 +48,7 @@ app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
 /* ROUTES WITH ATTACTMENTS */
 // Define routes for attachment handling
-app.post('/upload', verifyToken, attachmentUpload.single('attachment'), uploadAttachment);
+app.post('/attachment/upload', verifyToken, attachmentUpload.single('attachment'), uploadAttachment);
 
 
 /* ROUTES */
@@ -56,7 +56,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use('/messages', messageRoutes);
-app.use('/comments', commentRoutes);
+app.use(commentRoutes);
 
 // Start the Server  
 const PORT = process.env.PORT || 8080
