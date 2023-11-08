@@ -1,5 +1,6 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Attachment from "../models/Attachment.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
@@ -71,3 +72,29 @@ export const likePost = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
+
+// Upload a new attachment
+export const uploadAttachment = async (req, res) => {
+  try {
+    // Check if a file is provided in the request
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Create a new attachment document
+    const attachment = new Attachment({
+      post: req.body.postId, // Assuming you have a postId in the request body
+      fileName: req.file.originalname,
+      filePath: req.file.path, // You may want to store this in a dedicated server directory
+    });
+
+    await attachment.save();
+
+    return res.status(201).json(attachment);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Attachment upload failed' });
+  }
+};
+
+

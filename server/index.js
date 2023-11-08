@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import multer from "multer";
+// import multer from "multer";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
@@ -17,6 +17,8 @@ import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+import { uploadAttachment } from "./controllers/posts.js"
+import dbConnect from "./database/connect.js";
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -32,38 +34,47 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
+dbConnect();
+
 /* FILE STORAGE */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/assets");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage });
+import { upload } from "./upload/upload.js";
+import { attachmentUpload } from "./upload/upload.js";
 
 /* ROUTES WITH FILES */
 app.post("/auth/register", upload.single("picture"), register);
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
+
+/* ROUTES WITH ATTACTMENTS */
+// Define routes for attachment handling
+app.post('/upload', verifyToken, attachmentUpload.single('attachment'), uploadAttachment);
+
 
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 
-/* MONGOOSE SETUP */
-const PORT = process.env.PORT || 6001;
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
+// Use the attachment routes
+// app.use('/attachments', attachmentRoutes);
 
-    /* ADD DATA ONE TIME */
-    // User.insertMany(users);
-    // Post.insertMany(posts);
-  })
-  .catch((error) => console.log(`${error} did not connect`));
+/* MONGOOSE SETUP */
+// const PORT = process.env.PORT || 6001;
+// mongoose
+//   .connect(process.env.MONGO_URL, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => {
+//     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
+
+//     /* ADD DATA ONE TIME */
+//     // User.insertMany(users);
+//     // Post.insertMany(posts);
+//   })
+//   .catch((error) => console.log(`${error} did not connect`));
+
+// Start the Server  
+const PORT = process.env.PORT || 8080
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})
